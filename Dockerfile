@@ -37,6 +37,12 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Revenez à l'utilisateur root pour configurer Apache
 USER root
 
+# Créez le dossier var s'il n'existe pas
+RUN mkdir -p /var/www/html/var
+
+# Définissez les permissions pour le cache et les logs
+RUN chown -R www-data:www-data /var/www/html/var
+
 # Configurez Apache pour utiliser le répertoire public de Symfony
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -45,8 +51,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Activez le module Apache rewrite (nécessaire pour Symfony)
 RUN a2enmod rewrite
 
-# Définissez les permissions pour le cache et les logs
-RUN chown -R www-data:www-data /var/www/html/var
+# Générez le cache Symfony
+RUN php bin/console cache:clear --env=prod
 
 # Exposez le port 80 (port par défaut pour Apache)
 EXPOSE 80
