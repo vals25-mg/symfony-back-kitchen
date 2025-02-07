@@ -32,7 +32,7 @@ USER symfony_user
 COPY --chown=symfony_user:symfony_user . .
 
 # Installez les dépendances PHP (en mode production)
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Revenez à l'utilisateur root pour configurer Apache
 USER root
