@@ -24,11 +24,18 @@ RUN apt-get update && apt-get install -y \
 # Installez Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Créez un utilisateur non-root pour exécuter Composer
+RUN useradd -m symfony_user
+USER symfony_user
+
 # Copiez les fichiers de votre application Symfony
-COPY . .
+COPY --chown=symfony_user:symfony_user . .
 
 # Installez les dépendances PHP (en mode production)
 RUN composer install --no-dev --optimize-autoloader
+
+# Revenez à l'utilisateur root pour configurer Apache
+USER root
 
 # Configurez Apache pour utiliser le répertoire public de Symfony
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
