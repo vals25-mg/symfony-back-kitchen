@@ -32,8 +32,8 @@ COPY . .
 
 # Définir les variables d'environnement
 ENV APP_ENV=prod
-ENV APP_SECRET=your_secret_key
-ENV DATABASE_URL=mysql://user:password@database_host/database_name
+ENV APP_SECRET=980b726dfaf5489b46c341d937b76e72
+ENV DATABASE_URL="postgresql://avnadmin:AVNS_fDJfCnVhKRHNpeaM66d@pg-39cad0bd-rvalisoa3-28cc.i.aivencloud.com:14567/defaultdb?sslmode=require"
 
 # Vérifier que les variables sont bien chargées
 RUN export APP_ENV=prod && printenv | grep APP_ENV
@@ -42,7 +42,12 @@ RUN export APP_ENV=prod && printenv | grep APP_ENV
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Corriger les permissions avant le cache
-RUN mkdir -p var/cache var/log && chmod -R 777 var/cache var/log
+# RUN mkdir -p var/cache var/log && chmod -R 777 var/cache var/log
+
+# Créer les répertoires nécessaires et corriger les permissions
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var/cache var/log \
+    && chmod -R 775 var/cache var/log
 
 # Désactiver Dotenv si nécessaire dans config/bootstrap.php
 # (voir instructions ci-dessus)
