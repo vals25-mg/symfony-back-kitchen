@@ -32,11 +32,15 @@ COPY . .
 
 # Définir les variables d'environnement
 ENV APP_ENV=prod
+ENV APP_DEBUG=0
 ENV APP_SECRET=980b726dfaf5489b46c341d937b76e72
 ENV DATABASE_URL="postgresql://avnadmin:AVNS_fDJfCnVhKRHNpeaM66d@pg-39cad0bd-rvalisoa3-28cc.i.aivencloud.com:14567/defaultdb?sslmode=require"
 
 # Vérifier que les variables sont bien chargées
 RUN export APP_ENV=prod && printenv | grep APP_ENV
+
+RUN apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo pdo_pgsql
+
 
 # Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --no-scripts
