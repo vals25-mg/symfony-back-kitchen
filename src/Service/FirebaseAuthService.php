@@ -100,14 +100,11 @@ class FirebaseAuthService
             return $user;
         }
     
-        private function loadUserFromFirebase(string $idToken,string $refreshToken,string $expiresIn)
+        private function loadUserFromFirebase(string $idToken, string $refreshToken, string $expiresIn): array
         {
-
             $response = $this->httpClient->request('POST', "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={$this->firebaseApiKey}", [
                 'json' => [
                     'idToken' => $idToken,
-                    'refreshToken' => $refreshToken,
-                    'expiresIn' => $expiresIn
                 ]
             ]);
     
@@ -117,8 +114,13 @@ class FirebaseAuthService
                 throw new \Exception("Utilisateur introuvable.");
             }
     
-            $user = new Utilisateur();
-            $user->setEmail($data['users'][0]['email']);
+            $firebaseUser = $data['users'][0];
+    
+            $user = $this->entityManager->getRepository(Utilisateur::class)->findOneBy(['id' => $firebaseUser['localId']]);
+    
+            if (!$user) {
+                throw new \Exception("Utilisateur non trouvé dans la base de données.");
+            }
     
             return [
                 'user' => $user,
