@@ -45,9 +45,9 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # RUN mkdir -p var/cache var/log && chmod -R 777 var/cache var/log
 
 # Créer les répertoires nécessaires et corriger les permissions
-RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var/cache var/log \
-    && chmod -R 775 var/cache var/log
+RUN mkdir -p var/cache var/log var/cache/prod \
+    && chown -R www-data:www-data var/cache var/log var/cache/prod \
+    && chmod -R 777 var/cache var/log var/cache/prod
 
 # Désactiver Dotenv si nécessaire dans config/bootstrap.php
 # (voir instructions ci-dessus)
