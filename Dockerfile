@@ -24,24 +24,26 @@ RUN apt-get update && apt-get install -y \
 # Installez Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Créez un utilisateur non-root pour exécuter Composer
-RUN useradd -m symfony_user
-USER symfony_user
-
 # Copiez les fichiers de votre application Symfony
-COPY --chown=symfony_user:symfony_user . .
+COPY . .
+RUN chown -R www-data:www-data /var/www/html
 
-# Installez les dépendances PHP (en mode production)
+# Définir l'environnement de production
+ENV APP_ENV=prod
+
+# Supprimer le fichier .env pour éviter l'erreur en production
+RUN rm -f .env
+
+# Installer les dépendances PHP en mode production
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Revenez à l'utilisateur root pour configurer Apache
+# Définir les permissions avant de générer le cache
+RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
+
+# Générer le cache Symfony en tant que www-data
+USER www-data
+RUN php bin/console cache:clear --env=prod
 USER root
-
-# Créez le dossier var s'il n'existe pas
-RUN mkdir -p /var/www/html/var
-
-# Définissez les permissions pour le cache et les logs
-RUN chown -R www-data:www-data /var/www/html/var
 
 # Configurez Apache pour utiliser le répertoire public de Symfony
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -50,9 +52,6 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 # Activez le module Apache rewrite (nécessaire pour Symfony)
 RUN a2enmod rewrite
-
-# Générez le cache Symfony
-RUN php bin/console cache:clear --env=prod
 
 # Exposez le port 80 (port par défaut pour Apache)
 EXPOSE 80
