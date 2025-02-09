@@ -28,7 +28,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # Vérifier et supprimer les fichiers .env
-RUN rm -f .env .env.local
+# RUN rm -f .env .env.local
 
 # Définir les variables d'environnement
 ENV APP_ENV=prod
