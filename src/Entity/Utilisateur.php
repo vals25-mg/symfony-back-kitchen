@@ -45,7 +45,7 @@ class Utilisateur
 
     public function __construct()
     {
-        $this->roles[] = 'ROLE_USER';
+        //$this->roles[] = 'ROLE_USER';
     }
 
     public function getId(): ?string

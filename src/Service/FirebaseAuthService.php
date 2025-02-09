@@ -116,7 +116,7 @@ class FirebaseAuthService
     
             $firebaseUser = $data['users'][0];
     
-            $user = $this->entityManager->getRepository(Utilisateur::class)->findOneBy(['id' => $firebaseUser['localId']]);
+            $user = $this->entityManager->getRepository(Utilisateur::class)->findOneBy(['idUtilisateur' => $firebaseUser['localId']]);
     
             if (!$user) {
                 throw new \Exception("Utilisateur non trouvé dans la base de données.");
