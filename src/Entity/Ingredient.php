@@ -53,6 +53,11 @@ class Ingredient
      */
     private $idUniteMesure;
 
+    public function getId(): ?int
+{
+    return $this->idIngredient;
+}
+
     public function getIdIngredient(): ?int
     {
         return $this->idIngredient;

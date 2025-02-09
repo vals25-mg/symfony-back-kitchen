@@ -24,4 +24,14 @@ class UniteMesureRepository extends ServiceEntityRepository
         $this->_em->remove($uniteMesure);
         $this->_em->flush();
     }
+
+    public function findUniteMesureById(int $id): ?UniteMesure
+    {
+        return $this->find($id);
+    }
+
+    public function findAllUniteMesures(): array
+    {
+        return $this->findAll();
+    }
 }

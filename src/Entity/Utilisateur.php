@@ -17,9 +17,9 @@ class Utilisateur
      *
      * @ORM\Column(name="id_utilisateur", type="string", length=200, nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="SEQUENCE")
-     * @ORM\SequenceGenerator(sequenceName="utilisateur_id_utilisateur_seq", allocationSize=1, initialValue=1)
      */
+    //  * @ORM\GeneratedValue(strategy="SEQUENCE")
+    //  * @ORM\SequenceGenerator(sequenceName="utilisateur_id_utilisateur_seq", allocationSize=1, initialValue=1)
     private $idUtilisateur;
 
     /**
@@ -37,11 +37,27 @@ class Utilisateur
     private $password;
 
     /**
-     * @var string|null
+     * @var array|null
      *
-     * @ORM\Column(name="role", type="string", length=15, nullable=true)
+     * @ORM\Column(name="role", type="json", length=15, nullable=true)
      */
-    private $role;
+    private $role= [];
+
+    public function __construct()
+    {
+        $this->roles[] = 'ROLE_USER';
+    }
+
+    public function getId(): ?string
+    {
+        return $this->idUtilisateur;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->idUtilisateur = $id;
+        return $this;
+    }
 
     public function getIdUtilisateur(): ?string
     {
@@ -72,17 +88,32 @@ class Utilisateur
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getRole(): ?array
     {
         return $this->role;
     }
 
-    public function setRole(?string $role): static
+    public function setRole(?array $role): static
     {
         $this->role = $role;
 
         return $this;
     }
 
+    public function getRoles(): array
+    {
+        return $this->role;
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->role = $roles;
+        return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
 
 }

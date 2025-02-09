@@ -54,6 +54,11 @@ class StockIngredient
      */
     private $idIngredient;
 
+    public function getId(): ?int
+    {
+        return $this->idStockIngredient;
+    }
+
     public function getIdStockIngredient(): ?int
     {
         return $this->idStockIngredient;
@@ -107,5 +112,21 @@ class StockIngredient
         return $this;
     }
 
+    public function setIngredient(Ingredient $ingredient): self
+    {
+        $this->idIngredient = $ingredient;
+        return $this;
+    }
 
+    public function setValeurSortie(?float $valeurSortie): self
+    {
+        $this->sortie = $valeurSortie;
+        return $this;
+    }
+
+    public function setValeurEntree(?float $valeurEntree): self
+    {
+        $this->entree = $valeurEntree;
+        return $this;
+    }
 }

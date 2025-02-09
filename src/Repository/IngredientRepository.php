@@ -27,4 +27,15 @@ class IngredientRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function save(Ingredient $ingredient): void
+    {
+        $this->_em->persist($ingredient);
+        $this->_em->flush();
+    }
+
+    public function findIngredientById(int $id): ?Ingredient
+    {
+        return $this->find($id);
+    }
 }
