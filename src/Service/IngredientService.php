@@ -57,9 +57,9 @@ class IngredientService
         
         $ingredient = new Ingredient();
         $ingredient->setNomIngredient($nomIngredient);
-        $ingredient->setImgUrl($imgUrlPath);
+        $ingredient->setUrl($imgUrlPath);
         $ingredient->setLogo($logoPath);
-        $ingredient->setUniteMesure($unite);
+        $ingredient->setIdUniteMesure($unite);
 
         $this->entityManager->persist($ingredient);
         $this->entityManager->flush();
@@ -85,7 +85,7 @@ class IngredientService
             if (!$uniteMesure) {
                 throw new \InvalidArgumentException('Unité de mesure introuvable!');
             }
-            $ingredient->setUniteMesure($uniteMesure);
+            $ingredient->setIdUniteMesure($uniteMesure);
         }
 
         $uploadDir = __DIR__ . '/../../assets/img/uploads/';

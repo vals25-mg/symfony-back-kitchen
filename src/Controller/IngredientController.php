@@ -65,7 +65,16 @@ class IngredientController extends AbstractController
 
             $ingredient = $this->ingredientService->addIngredient($nomIngredient, $imageFile, $logo, $idUniteMesure);
             $jsonContent = $serializer->serialize($ingredient, 'json', ['groups' => ['ingredient:read']]);
-            return new JsonResponse($jsonContent, 201, [], true);
+            return new JsonResponse([
+                'id' => $ingredient->getId(),
+                'nomIngredient' => $ingredient->getNomIngredient(),
+                'imgUrl' => $ingredient->getUrl(),
+                'logo' => $ingredient->getLogo(),
+                'unite_mesure' => [
+                    $ingredient->getIdUniteMesure()->getIdUniteMesure(),
+                    $ingredient->getIdUniteMesure()->getNomUnite()
+                ],
+            ], 200);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 500);
         }
@@ -105,9 +114,12 @@ class IngredientController extends AbstractController
             return $this->json([
                 'id' => $ingredient->getId(),
                 'nomIngredient' => $ingredient->getNomIngredient(),
-                'imgUrl' => $ingredient->getImgUrl(),
+                'imgUrl' => $ingredient->getUrl(),
                 'logo' => $ingredient->getLogo(),
-                'id_unite_mesure' => $ingredient->getUniteMesure(),
+                'unite_mesure' => [
+                    $ingredient->getIdUniteMesure()->getIdUniteMesure(),
+                    $ingredient->getIdUniteMesure()->getNomUnite()
+                ],
             ], 200, [], ['groups' => 'ingredient:read']);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 500);

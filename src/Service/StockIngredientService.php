@@ -51,32 +51,35 @@ class StockIngredientService
 
     }
 
-    public function updateStockIngredient(int $id, ?int $idIngredient, ?float $valeurEntree, ?float $valeurSortie): ?StockIngredient
+    public function updateStockIngredient(int $id, array $data): StockIngredient
     {
-
         $stockIngredient = $this->stockIngredientRepository->find($id);
+
         if (!$stockIngredient) {
-            throw new \InvalidArgumentException('Stock d\'ingredient ingredient!');
+            throw new \InvalidArgumentException('StockIngredient introuvable.');
         }
 
-        if ($idIngredient !== null) {
-            $ingredient = $this->ingredientRepository->find($idIngredient);
+        if (isset($data['id_ingredient'])) {
+            $ingredient = $this->ingredientRepository->find($data['id_ingredient']);
             if (!$ingredient) {
-                throw new \InvalidArgumentException('Ingredient introuvable!');
+                throw new \InvalidArgumentException('Ingredient introuvable.');
             }
             $stockIngredient->setIngredient($ingredient);
         }
 
-        if ($valeurEntree !== null) {
-            $stockIngredient->setValeurEntree($valeurEntree);
+        // Update valeurEntree if provided, otherwise keep existing value
+        if (isset($data['valeur_entree'])) {
+            $stockIngredient->setValeurEntree($data['valeur_entree']);
         }
 
-        if ($valeurSortie !== null) {
-            $stockIngredient->setValeurSortie($valeurSortie);
+        // Update valeurSortie if provided, otherwise keep existing value
+        if (isset($data['valeur_sortie'])) {
+            $stockIngredient->setValeurSortie($data['valeur_sortie']);
         }
 
-        $this->entityManager->persist($ingredient);
         $this->entityManager->flush();
+
+        $this->entityManager->refresh($stockIngredient);
 
         return $stockIngredient;
     }

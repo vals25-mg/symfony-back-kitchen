@@ -68,35 +68,57 @@ class StockIngredientController extends AbstractController
             );
 
             $jsonContent = $serializer->serialize($stockIngredient, 'json', ['groups' => 'stockIngredient:read']);
-            return new JsonResponse($jsonContent, 201, [], true);
+            return new JsonResponse([
+                'id_stock_ingredient' => $stockIngredient->getId(),
+                'ingredient' => [
+                    'id_ingredient'=> $stockIngredient->getIdIngredient()->getId(),
+                    'nom_ingredient' => $stockIngredient->getIdIngredient()->getNomIngredient(),
+                ], 
+                'valeur_entree' => $stockIngredient->getEntree(),
+                'valeur_sortie' => $stockIngredient->getSortie(),
+            ], 201);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
 
 
-    #[Route('/api/v1/update_stock_ingredients/{id}', name: 'update_stock_ingredient', methods: ['POST', 'PUT', 'PATCH'])]
-    public function updateStockIngredient(Request $request, int $id): JsonResponse
+    #[Route('/api/v1/update_stock_ingredients/{id}', name: 'update_stock', methods: ['PUT'])]
+    public function updateStock(int $id, Request $request, SerializerInterface $serializer): JsonResponse
     {
 
-        $idIngredient = $request->request->get('id_ingredient');
-        $valeurEntree = $request->request->get('entree');
-        $valeurSortie = $request->request->get('sortie');
-
-        if (!$idIngredient && !$valeurEntree && !$valeurSortie) {
-            return $this->json(['error' => 'Aucun champ fourni pour la mise à jour.'], 400);
+        $token = $request->headers->get('Authorization');
+        
+        if (!$token || !str_starts_with($token, 'Bearer ')) {
+            return $this->json(['error' => 'Token introuvable ou invalide!'], 401);
         }
 
         try {
-            $stockIngredient = $this->stockIngredientService->updateStockIngredient($id, $valeurEntree, $valeurSortie);
-            return $this->json([
-                'id_stock_ingredient' => $stockIngredient->getId(),
-                'id_ingredient' => $stockIngredient->getIngredient(),
-                'valeur_entree' => $stockIngredient->getValeurEntree(),
-                'valeur_sortie' => $stockIngredient->getValeurSortie(),
-            ], 200, [], ['groups' => 'stockIngredient:read']);
+            $firebaseToken = str_replace('Bearer ', '', $token);
+
+            $decodedToken = $this->firebaseService->verifyIdToken($firebaseToken);
+
         } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
+            return $this->json(['error' => 'Utilisateur non connecte: ' . $e->getMessage()], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $stockIngredient = $this->stockIngredientService->updateStockIngredient($id, $data);
+
+            $jsonContent = $serializer->serialize($stockIngredient, 'json', ['groups' => 'stockIngredient:read']);
+            return new JsonResponse([
+                'id_stock_ingredient' => $stockIngredient->getId(),
+                'ingredient' => [
+                    'id_ingredient'=> $stockIngredient->getIdIngredient()->getId(),
+                    'nom_ingredient' => $stockIngredient->getIdIngredient()->getNomIngredient(),
+                ], 
+                'valeur_entree' => $stockIngredient->getEntree(),
+                'valeur_sortie' => $stockIngredient->getSortie(),
+            ], 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
 
