@@ -1,10 +1,10 @@
-# Utilisez une image PHP avec Apache (pour Symfony)
+# Utiliser une image PHP avec Apache
 FROM php:8.2-apache
 
-# Définissez le répertoire de travail
+# Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Installez les dépendances système nécessaires
+# Installer les dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -21,40 +21,45 @@ RUN apt-get update && apt-get install -y \
     bcmath \
     gd
 
-# Installez Composer
+# Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copiez les fichiers de votre application Symfony
+# Copier les fichiers Symfony
 COPY . .
 RUN chown -R www-data:www-data /var/www/html
 
-# Définir l'environnement de production
+# Définir les variables d'environnement
 ENV APP_ENV=prod
+ENV APP_SECRET=your_secret_key
+ENV DATABASE_URL=mysql://user:password@database_host/database_name
 
 # Supprimer le fichier .env pour éviter l'erreur en production
 RUN rm -f .env
 
-# Installer les dépendances PHP en mode production
+# Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Définir les permissions avant de générer le cache
+# Vérifier si l'environnement est bien défini
+RUN printenv | grep APP_ENV
+
+# Corriger les permissions avant le cache
 RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
-# Générer le cache Symfony en tant que www-data
+# Générer le cache Symfony avec no-warmup pour éviter les erreurs DB
 USER www-data
-RUN php bin/console cache:clear --env=prod
+RUN php bin/console cache:clear --env=prod --no-warmup
 USER root
 
-# Configurez Apache pour utiliser le répertoire public de Symfony
+# Configurer Apache pour Symfony
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Activez le module Apache rewrite (nécessaire pour Symfony)
+# Activer le module Apache rewrite
 RUN a2enmod rewrite
 
-# Exposez le port 80 (port par défaut pour Apache)
+# Exposer le port 80
 EXPOSE 80
 
-# Commande pour démarrer Apache
+# Lancer Apache
 CMD ["apache2-foreground"]
