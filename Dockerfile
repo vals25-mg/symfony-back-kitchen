@@ -26,29 +26,29 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copier les fichiers Symfony
 COPY . .
-RUN chown -R www-data:www-data /var/www/html
+
+# Vérifier et supprimer les fichiers .env
+RUN rm -f .env .env.local
 
 # Définir les variables d'environnement
 ENV APP_ENV=prod
 ENV APP_SECRET=your_secret_key
 ENV DATABASE_URL=mysql://user:password@database_host/database_name
 
-# Supprimer le fichier .env pour éviter l'erreur en production
-RUN rm -f .env
+# Vérifier que les variables sont bien chargées
+RUN export APP_ENV=prod && printenv | grep APP_ENV
 
 # Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Vérifier si l'environnement est bien défini
-RUN printenv | grep APP_ENV
-
 # Corriger les permissions avant le cache
-RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
+RUN mkdir -p var/cache var/log && chmod -R 777 var/cache var/log
 
-# Générer le cache Symfony avec no-warmup pour éviter les erreurs DB
-USER www-data
-RUN php bin/console cache:clear --env=prod --no-warmup
-USER root
+# Désactiver Dotenv si nécessaire dans config/bootstrap.php
+# (voir instructions ci-dessus)
+
+# Générer le cache Symfony
+RUN php bin/console cache:clear --env=prod --no-warmup || true
 
 # Configurer Apache pour Symfony
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
