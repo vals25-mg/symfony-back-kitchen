@@ -137,13 +137,11 @@ class IngredientController extends AbstractController
         }
 
         try {
-            // Remove "Bearer " from the token
+
             $idToken = str_replace('Bearer ', '', $token);
 
-            // Call FirebaseService to verify the token and get all claims
             $decodedToken = $this->firebaseService->verifyIdToken($idToken);
 
-            // Log the decoded token for further debugging
             error_log('Decoded Token: ' . json_encode($decodedToken));
 
             return new JsonResponse([
@@ -156,30 +154,12 @@ class IngredientController extends AbstractController
     }
 
 
-
-
     #[Route('api/v1/get_list_ingredient', name: 'get_ingredients', methods: ['GET'])]
     public function listIngredients(): JsonResponse
     {
         // Retrieve all ingredients from the repository
         $ingredients = $this->ingredientRepository->findAllIngredients();
 
-        // Convert ingredients to an array (or any structure that suits you)
-        // $data = [];
-        // foreach ($ingredients as $ingredient) {
-        //     $data[] = [
-        //         'id' => $ingredient->getId(),
-        //         'nomIngredient' => $ingredient->getNomIngredient(),
-        //         'imgUrl' => $ingredient->getUrl(),
-        //         'logo' => $ingredient->getLogo(),
-        //         'uniteMesure' => [
-        //             'id' => $ingredient->getUniteMesure()->getIdUniteMesure(),
-        //         //     'nomUnite' => $ingredient->getUniteMesure()->getNomUnite()
-        //         ]
-        //     ];
-        // }
-
-        // Return the ingredients as JSON
         return $this->json($ingredients);
     }
 }

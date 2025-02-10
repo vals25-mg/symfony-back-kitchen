@@ -52,6 +52,20 @@ class StockIngredientController extends AbstractController
     #[Route('/api/v1/add/stock_ingredients', name: 'add_stock', methods: ['POST'])]
     public function addStock(Request $request, SerializerInterface $serializer): JsonResponse
     {
+        $token = $request->headers->get('Authorization');
+        
+        if (!$token || !str_starts_with($token, 'Bearer ')) {
+            return $this->json(['error' => 'Token introuvable ou invalide!'], 401);
+        }
+
+        try {
+            $firebaseToken = str_replace('Bearer ', '', $token);
+
+            $decodedToken = $this->firebaseService->verifyIdToken($firebaseToken);
+
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Utilisateur non connecte: ' . $e->getMessage()], 401);
+        }
 
         date_default_timezone_set('Africa/Nairobi');
 

@@ -45,6 +45,22 @@ class FirebaseService
         return $verifiedIdToken->claims()->all();
     }
 
+    public function verifyTokenId(string $idToken)
+    {
+        try {
+            $verifiedIdToken = $this->auth->verifyIdToken($idToken);
+            error_log('Verified Firebase Token: ' . json_encode($verifiedIdToken->claims()->all()));  // Log the decoded claims
+            return $verifiedIdToken->claims()->get('sub');
+        } catch (\Exception $e) {
+            error_log('Error verifying token: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    
+    
+
+
 
     /*public function verifyIdToken(string $idToken)
     {

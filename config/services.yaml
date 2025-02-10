@@ -40,3 +40,9 @@ services:
   App\Service\FirebaseService:
     arguments:
       $params: "@parameter_bag"
+
+  App\Repository\CommandeRepository:
+    arguments:
+      $registry: '@doctrine'
+    autowire: true
+    autoconfigure: true

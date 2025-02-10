@@ -93,7 +93,7 @@ class IngredientService
         if ($imageFile !== null) {
             $fileName = $imageFile->getClientOriginalName(); 
             $imageFile->move($uploadDir, $fileName);
-            $ingredient->setImgUrl('/uploads/' . $fileName);
+            $ingredient->setUrl('/uploads/' . $fileName);
         }
 
         if ($logoFile !== null) {
