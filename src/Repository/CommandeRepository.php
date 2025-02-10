@@ -28,4 +28,12 @@ class CommandeRepository extends ServiceEntityRepository
     {
         return $this->findAll();
     }
+    public function findCommandeByEtat5(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.etat = :etat')
+            ->setParameter('etat', 5)
+            ->getQuery()
+            ->getResult();
+    }
 }

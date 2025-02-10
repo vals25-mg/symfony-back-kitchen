@@ -23,8 +23,15 @@ class CommandeService
     private Security $security;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(CommandeRepository $commandeRepository, PlatRepository $platRepository, UtilisateurRepository $utilisateurRepository, Security $security, EntityManagerInterface $entityManager)
-    {
+
+
+    public function __construct(
+        CommandeRepository $commandeRepository,
+        PlatRepository $platRepository,
+        UtilisateurRepository $utilisateurRepository,
+        Security $security,
+        EntityManagerInterface $entityManager
+    ) {
         $this->commandeRepository = $commandeRepository;
         $this->platRepository = $platRepository;
         $this->utilisateurRepository = $utilisateurRepository;
@@ -47,14 +54,15 @@ class CommandeService
             throw new \InvalidArgumentException('client introuvable.');
         }
 
-        $interval = new \DateInterval('PT' . preg_replace('/^(\d+):(\d+):(\d+)$/', '$1H$2M$3S', $plat->getTempsCuisson()));
-        
+        // $interval = new \DateInterval('PT' . preg_replace('/^(\d+):(\d+):(\d+)$/', '$1H$2M$3S', $plat->getTempsCuisson()));
+
         $commande = new Commande();
         $commande->setIdPlat($plat);
         $commande->setIdClient($client);
         $commande->setQuantitePlat($quantitePlat);
+        $commande->setEtat(5);
         $commande->setDateHeureCommande($dateCommande);
-        $commande->setDateHeureLivraison($dateCommande->add($interval));
+        // $commande->setDateHeureLivraison($dateCommande->add($interval));
 
         $this->entityManager->persist($commande);
         $this->entityManager->flush();
@@ -87,13 +95,13 @@ class CommandeService
         $uploadDir = __DIR__ . '/../../assets/img/uploads/';
 
         if ($imageFile !== null) {
-            $fileName = $imageFile->getClientOriginalName(); 
+            $fileName = $imageFile->getClientOriginalName();
             $imageFile->move($uploadDir, $fileName);
             $ingredient->setUrl('/uploads/' . $fileName);
         }
 
         if ($logoFile !== null) {
-            $logoFileName = $logoFile->getClientOriginalName(); 
+            $logoFileName = $logoFile->getClientOriginalName();
             $logoFile->move($uploadDir, $logoFileName);
             $ingredient->setLogo('/uploads/' . $logoFileName);
         }
@@ -103,6 +111,6 @@ class CommandeService
 
         return $ingredient;
     }*/
-    
+
 
 }
